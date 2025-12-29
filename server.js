@@ -16,19 +16,30 @@ app.get("/", (req, res) => {
 
 app.post("/chat", async (req, res) => {
   try {
+    console.log("API KEY EXISTS:", !!process.env.OPENAI_API_KEY);
+
     const userMessage = req.body.message;
 
     const response = await client.chat.completions.create({
-      model: "gpt-4.1-mini",
+      model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "Você é um assistente de criação de conteúdo profissional." },
+        {
+          role: "system",
+          content: "Você é um assistente de criação de conteúdo profissional para LinkedIn e Instagram."
+        },
         { role: "user", content: userMessage }
       ]
     });
 
-    res.json({ response: response.choices[0].message.content });
+    res.json({
+      response: response.choices[0].message.content
+    });
+
   } catch (error) {
-    res.status(500).json({ error: "Erro ao gerar resposta" });
+    console.error("OPENAI ERROR FULL:", error);
+    res.status(500).json({
+      error: error.message || "Erro desconhecido"
+    });
   }
 });
 
