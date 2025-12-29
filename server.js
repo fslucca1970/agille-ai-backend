@@ -1,25 +1,11 @@
-const express = require("express");
-const cors = require("cors");
-const OpenAI = require("openai");
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
-app.get("/", (req, res) => {
-  res.send("Assistente de IA rodando.");
-});
-
 app.post("/chat", async (req, res) => {
   try {
+    console.log("API KEY:", process.env.OPENAI_API_KEY);
+
     const userMessage = req.body.message;
 
     const response = await client.chat.completions.create({
-      model: "gpt-4.1-mini",
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: "Você é um assistente de criação de conteúdo profissional." },
         { role: "user", content: userMessage }
@@ -28,11 +14,7 @@ app.post("/chat", async (req, res) => {
 
     res.json({ response: response.choices[0].message.content });
   } catch (error) {
-    res.status(500).json({ error: "Erro ao gerar resposta" });
+    console.error("ERRO OPENAI:", error.message);
+    res.status(500).json({ error: error.message });
   }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("Servidor rodando na porta", PORT);
 });
