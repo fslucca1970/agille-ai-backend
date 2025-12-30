@@ -19,21 +19,36 @@ app.post("/chat", async (req, res) => {
     const userMessage = req.body.message.toLowerCase();
 
     if (userMessage.includes("imagem") || userMessage.includes("foto") || userMessage.includes("crie uma imagem")) {
-      // Geração de imagem
+      // Gerar o texto do post
+      const chatResponse = await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "Você é um assistente de criação de conteúdo profissional para LinkedIn e Instagram."
+          },
+          { role: "user", content: req.body.message }
+        ]
+      });
+
+      const postText = chatResponse.choices[0].message.content;
+
+      // Gerar a imagem
       const imageResponse = await client.images.generate({
         prompt: req.body.message,
         n: 1,
         size: "512x512"
       });
+
       const imageUrl = imageResponse.data[0].url;
 
       res.json({
-        response: "Aqui está a imagem que você pediu:",
+        response: postText,
         image_url: imageUrl
       });
 
     } else {
-      // Geração de texto
+      // Apenas texto
       const chatResponse = await client.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
