@@ -19,36 +19,12 @@ app.post("/chat", async (req, res) => {
     const userMessage = req.body.message.toLowerCase();
 
     if (userMessage.includes("imagem") || userMessage.includes("foto") || userMessage.includes("crie uma imagem")) {
-      // Gerar o texto do post
-      const chatResponse = await client.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: "Você é um assistente de criação de conteúdo profissional para LinkedIn e Instagram."
-          },
-          { role: "user", content: req.body.message }
-        ]
-      });
-
-      const postText = chatResponse.choices[0].message.content;
-
-      // Gerar a imagem
-      const imageResponse = await client.images.generate({
-        prompt: req.body.message,
-        n: 1,
-        size: "512x512"
-      });
-
-      const imageUrl = imageResponse.data[0].url;
-
+      // Resposta para pedidos de imagem: apenas texto
       res.json({
-        response: postText,
-        image_url: imageUrl
+        response: "Desculpe, este assistente gera apenas textos e não imagens."
       });
-
     } else {
-      // Apenas texto
+      // Geração de texto normal
       const chatResponse = await client.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
@@ -76,3 +52,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
+
