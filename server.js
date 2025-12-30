@@ -6,6 +6,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+/* ===============================
+   FUNÇÃO DE DECISÃO (PASSO 1)
+================================ */
 function pediuImagem(texto) {
   const palavrasChave = [
     "imagem",
@@ -27,11 +34,6 @@ function pediuImagem(texto) {
   return palavrasChave.some(p => msg.includes(p));
 }
 
-
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
 app.get("/", (req, res) => {
   res.send("Assistente de IA rodando.");
 });
@@ -42,7 +44,14 @@ app.post("/chat", async (req, res) => {
 
     const userMessage = req.body.message;
 
-    const response = await client.chat.completions.create({
+    // PASSO 2 — decisão
+    const gerarImagem = pediuImagem(userMessage);
+
+    let textoResposta = null;
+    let imagemResposta = null;
+
+    // 1️⃣ Geração de TEXTO (sempre)
+    const responseTexto = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
@@ -53,8 +62,23 @@ app.post("/chat", async (req, res) => {
       ]
     });
 
+    textoResposta = responseTexto.choices[0].message.content;
+
+    // 2️⃣ Geração de IMAGEM (somente se pedir)
+    if (gerarImagem) {
+      const responseImagem = await client.images.generate({
+        model: "gpt-image-1",
+        prompt: `Imagem profissional para redes sociais sobre: ${userMessage}`,
+        size: "1024x1024"
+      });
+
+      imagemResposta = responseImagem.data[0].url;
+    }
+
+    // 3️⃣ Resposta final
     res.json({
-      response: response.choices[0].message.content
+      texto: textoResposta,
+      imagem: imagemResposta
     });
 
   } catch (error) {
