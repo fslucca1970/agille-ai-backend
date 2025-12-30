@@ -6,6 +6,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+function pediuImagem(texto) {
+  const palavrasChave = [
+    "imagem",
+    "arte",
+    "ilustração",
+    "visual",
+    "criar imagem",
+    "gerar imagem",
+    "faça uma imagem",
+    "gere uma imagem",
+    "imagem para post",
+    "imagem para linkedin",
+    "imagem para instagram"
+  ];
+
+  if (!texto) return false;
+
+  const msg = texto.toLowerCase();
+  return palavrasChave.some(p => msg.includes(p));
+}
+
+
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
