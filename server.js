@@ -50,9 +50,15 @@ app.post("/chat", async (req, res) => {
           {
             role: "system",
             content:
-              "Você é um assistente de criação de conteúdo profissional para LinkedIn e Instagram."
+              "Você é um assistente de criação de conteúdo profissional para LinkedIn e Instagram. " +
+              "Nunca inicie textos com saudações, cumprimentos ou chamadas ao público, como por exemplo: " +
+              "'Olá, turma do LinkedIn', 'Olá, pessoal', 'Bom dia a todos', 'Fala, pessoal', ou variações semelhantes. " +
+              "O conteúdo deve começar diretamente no tema, de forma objetiva, clara e profissional."
           },
-          { role: "user", content: req.body.message }
+          {
+            role: "user",
+            content: req.body.message
+          }
         ]
       });
 
